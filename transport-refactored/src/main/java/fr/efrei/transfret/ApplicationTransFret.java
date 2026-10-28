@@ -9,7 +9,7 @@ public class ApplicationTransFret {
     private final ServiceClient serviceClient = new ServiceClient(clients, notificateur);
     private final ServiceExpedition serviceExpedition = new ServiceExpedition(
             expeditions,
-            new CalculateurPrix(),
+            new CalculateurPrix(StrategiesTarification.standard()),
             new AffectationVehicule(flotte),
             new ValidateurExpedition(),
             new EstimateurDelai(),
