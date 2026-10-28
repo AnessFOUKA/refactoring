@@ -12,6 +12,8 @@ public class EstimateurDelai {
     private static final int SEUIL_LONG_COURRIER_AERIEN_KM = 3_000;
     private static final int DELAI_AERIEN_COURT_COURRIER = 1;
     private static final int DELAI_AERIEN_LONG_COURRIER = 2;
+    private static final double DISTANCE_FLUVIALE_PAR_JOUR = 360.0;
+    private static final int JOURS_SUPPLEMENTAIRES_FLUVIAUX = 1;
 
     public int estimer(int distance, ModeTransport mode, boolean urgent) {
         int jours = switch (mode) {
@@ -20,6 +22,8 @@ public class EstimateurDelai {
                     + JOURS_SUPPLEMENTAIRES_RAIL - (urgent ? 1 : 0);
             case MER -> (int) Math.ceil(distance / DISTANCE_MER_PAR_JOUR) + JOURS_SUPPLEMENTAIRES_MER;
             case AIR -> estimerAir(distance, urgent);
+            case FLUVIAL -> (int) Math.ceil(distance / DISTANCE_FLUVIALE_PAR_JOUR)
+                    + JOURS_SUPPLEMENTAIRES_FLUVIAUX;
         };
         return Math.max(jours, 1);
     }

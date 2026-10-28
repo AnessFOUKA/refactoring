@@ -14,6 +14,7 @@ public class Flotte implements ParcVehicules {
         vehicules.add(new Train("TR-0001", 600000));
         vehicules.add(new Bateau("CMA-CGM-01", 20000000, true));
         vehicules.add(new Avion("F-GTXA", 100000));
+        vehicules.add(new Peniche());
     }
 
     @Override

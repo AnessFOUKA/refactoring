@@ -29,6 +29,12 @@ public class ValidateurExpedition {
         if (dangereux && mode == ModeTransport.AIR) {
             return Optional.of("ERREUR : les matières dangereuses sont interdites en transport aérien");
         }
+        if (refrigere && mode == ModeTransport.FLUVIAL) {
+            return Optional.of("ERREUR : le transport réfrigéré n'est pas possible par voie fluviale");
+        }
+        if (urgent && mode == ModeTransport.FLUVIAL) {
+            return Optional.of("ERREUR : pas d'option urgente pour le transport fluvial");
+        }
         if (refrigere && mode != ModeTransport.ROUTE && mode != ModeTransport.MER) {
             return Optional.of("ERREUR : le transport réfrigéré n'est possible que par route ou par mer");
         }

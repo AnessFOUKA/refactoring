@@ -103,7 +103,8 @@ class DecorateursPrixTest {
                         ModeTransport.ROUTE, tarifFixe,
                         ModeTransport.RAIL, tarifFixe,
                         ModeTransport.MER, tarifFixe,
-                        ModeTransport.AIR, tarifFixe
+                        ModeTransport.AIR, tarifFixe,
+                        ModeTransport.FLUVIAL, tarifFixe
                 ),
                 Map.of(
                         TypeClient.PARTICULIER, new RemiseParticulier(),

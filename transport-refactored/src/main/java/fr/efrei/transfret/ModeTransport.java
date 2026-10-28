@@ -4,5 +4,6 @@ public enum ModeTransport {
     ROUTE,
     RAIL,
     MER,
-    AIR
+    AIR,
+    FLUVIAL
 }

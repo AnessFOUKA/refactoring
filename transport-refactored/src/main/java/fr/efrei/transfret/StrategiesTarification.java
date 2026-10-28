@@ -37,7 +37,8 @@ public class StrategiesTarification {
                         ModeTransport.ROUTE, new TarifRoute(),
                         ModeTransport.RAIL, new TarifRail(),
                         ModeTransport.MER, new TarifMer(),
-                        ModeTransport.AIR, new TarifAir()
+                        ModeTransport.AIR, new TarifAir(),
+                        ModeTransport.FLUVIAL, new TarifFluvial()
                 ),
                 Map.of(
                         TypeClient.PARTICULIER, new RemiseParticulier(),
