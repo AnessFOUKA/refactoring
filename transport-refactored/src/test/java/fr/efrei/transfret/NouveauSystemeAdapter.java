@@ -27,40 +27,31 @@ import java.util.stream.Collectors;
  */
 public class NouveauSystemeAdapter implements SystemeTransport {
 
-    private ServiceClient serviceClient;
-    private ServiceExpedition serviceExpedition;
+    private ApplicationTransFret application = new ApplicationTransFret();
 
     @Override
     public void reinitialiser() {
-        Database.getInstance();
-        Database.expeditions.clear();
-        Database.clients.clear();
-        EmailService.journal.clear();
-        SmsService.journal.clear();
-        ServiceExpedition.compteur = 0;
-        Flotte.initialiser();
-        serviceClient = new ServiceClient();
-        serviceExpedition = new ServiceExpedition();
+        application = new ApplicationTransFret();
     }
 
     @Override
     public Optional<String> creerClient(DemandeClient d) {
-        Client client = serviceClient.creerClient(d.nom(), d.email(), d.telephone(), d.adresse(),
+        Client client = application.serviceClient().creerClient(d.nom(), d.email(), d.telephone(), d.adresse(),
                 TypeClient.valueOf(d.type().name()), d.siret());
         return Optional.ofNullable(client).map(Client::getEmail);
     }
 
     @Override
     public Optional<String> creerExpedition(DemandeExpedition d) {
-        Client client = Database.clients.get(d.refClient());
-        Expedition expedition = serviceExpedition.creerExpedition(client, versColis(d.colis()), d.villeDepart(),
+        Client client = application.clients().trouverParEmail(d.refClient()).orElse(null);
+        Expedition expedition = application.serviceExpedition().creerExpedition(client, versColis(d.colis()), d.villeDepart(),
                 d.villeArrivee(), ModeTransport.valueOf(d.mode().name()), d.urgent(), d.assurance());
         return Optional.ofNullable(expedition).map(Expedition::getId);
     }
 
     @Override
     public Optional<EtatExpedition> consulter(String id) {
-        Expedition e = Database.expeditions.get(id);
+        Expedition e = application.expeditions().trouverParId(id).orElse(null);
         if (e == null) {
             return Optional.empty();
         }
@@ -71,42 +62,47 @@ public class NouveauSystemeAdapter implements SystemeTransport {
 
     @Override
     public OptionalDouble devisTTC(DemandeDevis d) {
-        double devis = serviceExpedition.calculerDevis(versColis(d.colis()), d.villeDepart(), d.villeArrivee(),
+        double devis = application.serviceExpedition().calculerDevis(versColis(d.colis()), d.villeDepart(), d.villeArrivee(),
                 ModeTransport.valueOf(d.mode().name()), d.urgent(), d.assurance(), TypeClient.valueOf(d.typeClient().name()));
         return devis == ServiceExpedition.DEVIS_INDISPONIBLE ? OptionalDouble.empty() : OptionalDouble.of(devis);
     }
 
     @Override
     public boolean demarrer(String id) {
-        return serviceExpedition.demarrerExpedition(id);
+        return application.serviceExpedition().demarrerExpedition(id);
     }
 
     @Override
     public boolean livrer(String id) {
-        return serviceExpedition.livrerExpedition(id);
+        return application.serviceExpedition().livrerExpedition(id);
     }
 
     @Override
     public boolean annuler(String id) {
-        return serviceExpedition.annulerExpedition(id);
+        return application.serviceExpedition().annulerExpedition(id);
     }
 
     @Override
     public Optional<String> facture(String id) {
-        GenerateurFacture generateurFacture = new GenerateurFacture();
-        return Optional.ofNullable(Database.expeditions.get(id)).map(generateurFacture::generer);
+        return application.expeditions().trouverParId(id).map(application.generateurFacture()::generer);
     }
 
     @Override
     public List<Notification> notifications() {
-        List<Notification> notifications = new ArrayList<>();
-        for (String[] email : EmailService.journal) {
-            notifications.add(new Notification(Canal.EMAIL, email[0], email[1]));
-        }
-        for (String[] sms : SmsService.journal) {
-            notifications.add(new Notification(Canal.SMS, sms[0], sms[1]));
-        }
-        return notifications;
+        return application.notificateur().notifications().stream()
+                .map(NouveauSystemeAdapter::versNotification)
+                .collect(Collectors.toList());
+    }
+
+    private static Notification versNotification(NotificationEnvoyee notification) {
+        Canal canal = switch (notification.canal()) {
+            case EMAIL -> Canal.EMAIL;
+            case SMS -> Canal.SMS;
+        };
+        String contenu = notification.canal() == CanalMessage.EMAIL
+                ? notification.sujet()
+                : notification.contenu();
+        return new Notification(canal, notification.destinataire(), contenu);
     }
 
     private static java.time.LocalDate jour(Date date) {

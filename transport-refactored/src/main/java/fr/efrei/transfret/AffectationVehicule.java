@@ -4,6 +4,12 @@ import java.util.List;
 
 public class AffectationVehicule {
 
+    private final ParcVehicules parcVehicules;
+
+    public AffectationVehicule(ParcVehicules parcVehicules) {
+        this.parcVehicules = parcVehicules;
+    }
+
     // retourne le premier véhicule disponible et compatible, null si aucun
     public Vehicule trouverVehicule(List<Colis> colis, ModeTransport mode) {
         double poids = 0;
@@ -14,7 +20,7 @@ public class AffectationVehicule {
             if (c.getType() == TypeMarchandise.DANGEREUX) dangereux = true;
             if (c.getType() == TypeMarchandise.REFRIGERE) refrigere = true;
         }
-        for (Vehicule v : Flotte.vehicules) {
+        for (Vehicule v : parcVehicules.vehicules()) {
             if (!v.estDisponible()) continue;
             if (v.getCapaciteMax() - v.getChargeActuelle() < poids) continue;
             if (mode == ModeTransport.ROUTE) {
