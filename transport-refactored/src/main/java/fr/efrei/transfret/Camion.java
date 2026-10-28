@@ -1,31 +1,39 @@
 package fr.efrei.transfret;
 
-public class Camion extends Vehicule {
+import java.util.List;
 
-    protected boolean adr; // certification matières dangereuses
+public class Camion extends Vehicule implements VehiculeRoutier, VehiculeCertifieDangereux {
 
-    public Camion(String immatriculation, double capaciteMax, boolean adr) {
+    private final boolean certifieDangereux;
+
+    public Camion(String immatriculation, double capaciteMax, boolean certifieDangereux) {
         super(immatriculation, capaciteMax);
-        this.adr = adr;
+        this.certifieDangereux = certifieDangereux;
     }
 
-    public void rouler(int km) {
-        System.out.println("Le camion " + immatriculation + " roule sur " + km + " km");
+    @Override
+    public ModeTransport mode() {
+        return ModeTransport.ROUTE;
     }
 
-    public void naviguer(int milesNautiques) {
-        throw new UnsupportedOperationException("Un camion ne navigue pas");
+    @Override
+    protected boolean accepteMarchandises(java.util.List<Colis> colis) {
+        return !contient(TypeMarchandise.REFRIGERE, colis)
+                && (!contient(TypeMarchandise.DANGEREUX, colis) || peutTransporterMatieresDangereuses());
     }
 
-    public void voler(int altitude) {
-        throw new UnsupportedOperationException("Un camion ne vole pas");
+    @Override
+    protected void effectuerDepart(int distanceKm, List<Colis> colis) {
+        rouler(distanceKm);
     }
 
-    public void activerRefrigeration(double temperature) {
-        throw new UnsupportedOperationException("Ce camion n'est pas frigorifique");
+    @Override
+    public void rouler(int kilometres) {
+        System.out.println("Le camion " + immatriculation + " roule sur " + kilometres + " km");
     }
 
+    @Override
     public boolean peutTransporterMatieresDangereuses() {
-        return adr;
+        return certifieDangereux;
     }
 }

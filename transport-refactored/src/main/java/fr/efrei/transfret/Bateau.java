@@ -1,38 +1,47 @@
 package fr.efrei.transfret;
 
-public class Bateau extends Vehicule {
+import java.util.List;
 
-    private boolean conteneursRefrigeres;
+public class Bateau extends Vehicule implements VehiculeNavigable, VehiculeRefrigerant,
+        VehiculeCertifieDangereux {
+
+    private static final double TEMPERATURE_REFRIGERATION_CELSIUS = 4;
+    private final boolean conteneursRefrigeres;
 
     public Bateau(String immatriculation, double capaciteMax, boolean conteneursRefrigeres) {
         super(immatriculation, capaciteMax);
         this.conteneursRefrigeres = conteneursRefrigeres;
     }
 
-    public void rouler(int km) {
-        throw new UnsupportedOperationException("Un bateau ne roule pas");
+    public ModeTransport mode() {
+        return ModeTransport.MER;
     }
 
+    @Override
+    protected boolean accepteMarchandises(List<Colis> colis) {
+        return conteneursRefrigeres || !contient(TypeMarchandise.REFRIGERE, colis);
+    }
+
+    @Override
+    protected void effectuerDepart(int distanceKm, List<Colis> colis) {
+        naviguer(convertirEnMillesNautiques(distanceKm));
+        if (contient(TypeMarchandise.REFRIGERE, colis)) {
+            activerRefrigeration(TEMPERATURE_REFRIGERATION_CELSIUS);
+        }
+    }
+
+    @Override
     public void naviguer(int milesNautiques) {
         System.out.println("Le navire " + immatriculation + " navigue sur " + milesNautiques + " milles nautiques");
     }
 
-    public void voler(int altitude) {
-        throw new UnsupportedOperationException("Un bateau ne vole pas");
+    @Override
+    public void activerRefrigeration(double temperatureCelsius) {
+        System.out.println("Conteneurs frigorifiques réglés à " + temperatureCelsius + "°C");
     }
 
-    public void activerRefrigeration(double temperature) {
-        if (!conteneursRefrigeres) {
-            throw new UnsupportedOperationException("Pas de conteneurs frigorifiques sur ce navire");
-        }
-        System.out.println("Conteneurs frigorifiques réglés à " + temperature + "°C");
-    }
-
+    @Override
     public boolean peutTransporterMatieresDangereuses() {
         return true;
-    }
-
-    public boolean aConteneursRefrigeres() {
-        return conteneursRefrigeres;
     }
 }

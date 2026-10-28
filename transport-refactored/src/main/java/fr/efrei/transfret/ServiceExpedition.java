@@ -12,10 +12,6 @@ public class ServiceExpedition {
     private static final int PLAGE_NUMEROS_ALEATOIRES_EXPEDITION = 9_000;
     private static final double TAUX_TVA = 1.20;
     private static final int JOURS_CALENDAIRES = Calendar.DAY_OF_MONTH;
-    private static final double KILOMETRES_PAR_MILLE_NAUTIQUE = 1.852;
-    private static final int DISTANCE_ROULAGE_AVION_KM = 2;
-    private static final int ALTITUDE_CROISIERE_PIEDS = 35_000;
-    private static final double TEMPERATURE_REFRIGERATION_CELSIUS = 4;
     private static final double FRAIS_ANNULATION_EN_COURS = 0.50;
 
     public static final double DEVIS_INDISPONIBLE = -1;
@@ -107,24 +103,7 @@ public class ServiceExpedition {
         e.setStatut(StatutExpedition.EN_COURS);
         Vehicule v = e.getVehicule();
         v.setDisponible(false);
-        try {
-            v.faireLePlein();
-        } catch (Exception ex) {
-        }
-        if (e.getMode() == ModeTransport.ROUTE || e.getMode() == ModeTransport.RAIL) {
-            v.rouler(e.getDistance());
-        } else if (e.getMode() == ModeTransport.MER) {
-            v.naviguer((int) (e.getDistance() / KILOMETRES_PAR_MILLE_NAUTIQUE));
-        } else if (e.getMode() == ModeTransport.AIR) {
-            v.rouler(DISTANCE_ROULAGE_AVION_KM);
-            v.voler(ALTITUDE_CROISIERE_PIEDS);
-        }
-        for (Colis c : e.getColis()) {
-            if (c.getType() == TypeMarchandise.REFRIGERE) {
-                v.activerRefrigeration(TEMPERATURE_REFRIGERATION_CELSIUS);
-                break;
-            }
-        }
+        v.partir(e.getDistance(), e.getColis());
         expeditions.mettreAJour(e);
         notificateur.notifier(e.getClient(), "Votre expédition " + e.getId() + " est en route",
                 "Votre expédition a quitté " + e.getVilleDepart() + ".",
