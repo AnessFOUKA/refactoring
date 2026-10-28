@@ -2,20 +2,17 @@ package fr.efrei.transfret;
 
 public class Colis {
 
-    public static final int STANDARD = 0;
-    public static final int FRAGILE = 1;
-    public static final int DANGEREUX = 2;
-    public static final int REFRIGERE = 3;
+    private static final double CENTIMETRES_CUBES_PAR_METRE_CUBE = 1_000_000;
 
     private String description;
     private double poids;        // en kg
     private double longueur;     // en cm
     private double largeur;      // en cm
     private double hauteur;      // en cm
-    private int type;            // 0 = standard, 1 = fragile, 2 = dangereux, 3 = refrigere
+    private TypeMarchandise type;
     private double valeurDeclaree;
 
-    public Colis(String description, double poids, double longueur, double largeur, double hauteur, int type, double valeurDeclaree) {
+    public Colis(String description, double poids, double longueur, double largeur, double hauteur, TypeMarchandise type, double valeurDeclaree) {
         this.description = description;
         this.poids = poids;
         this.longueur = longueur;
@@ -27,22 +24,11 @@ public class Colis {
 
     // volume en m3
     public double getVolume() {
-        return (longueur * largeur * hauteur) / 1000000;
+        return (longueur * largeur * hauteur) / CENTIMETRES_CUBES_PAR_METRE_CUBE;
     }
 
     public String getLibelleType() {
-        switch (type) {
-            case 0:
-                return "Standard";
-            case 1:
-                return "Fragile";
-            case 2:
-                return "Dangereux";
-            case 3:
-                return "Réfrigéré";
-            default:
-                return "Inconnu";
-        }
+        return type.getLibelle();
     }
 
     public String getDescription() {
@@ -85,11 +71,11 @@ public class Colis {
         this.hauteur = hauteur;
     }
 
-    public int getType() {
+    public TypeMarchandise getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(TypeMarchandise type) {
         this.type = type;
     }
 

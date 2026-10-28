@@ -5,10 +5,13 @@ import java.util.Date;
 
 public class Utils {
 
+    private static final double CENTIMES_PAR_EURO = 100.0;
+    public static final int DISTANCE_INCONNUE = -1;
+
     public static SimpleDateFormat FORMAT_DATE = new SimpleDateFormat("dd/MM/yyyy");
 
     public static double arrondir(double valeur) {
-        return Math.round(valeur * 100.0) / 100.0;
+        return Math.round(valeur * CENTIMES_PAR_EURO) / CENTIMES_PAR_EURO;
     }
 
     public static String formaterDate(Date d) {
@@ -26,7 +29,7 @@ public class Utils {
         return email != null && email.contains("@") && email.contains(".");
     }
 
-    // retourne la distance en km entre deux villes, -1 si inconnue
+    // retourne la distance en km entre deux villes, DISTANCE_INCONNUE si inconnue
     public static int getDistance(String villeA, String villeB) {
         String a = villeA.toUpperCase();
         String b = villeB.toUpperCase();
@@ -47,6 +50,6 @@ public class Utils {
         } else if ((a.equals("PARIS") && b.equals("NEW YORK")) || (a.equals("NEW YORK") && b.equals("PARIS"))) {
             return 5840;
         }
-        return -1;
+        return DISTANCE_INCONNUE;
     }
 }

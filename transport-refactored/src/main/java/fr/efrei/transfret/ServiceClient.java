@@ -2,7 +2,9 @@ package fr.efrei.transfret;
 
 public class ServiceClient {
 
-    public Client creerClient(String nom, String email, String telephone, String adresse, String type, String siret) {
+    private static final int LONGUEUR_SIRET = 14;
+
+    public Client creerClient(String nom, String email, String telephone, String adresse, TypeClient type, String siret) {
         if (nom == null || nom.trim().length() == 0) {
             System.out.println("ERREUR : nom obligatoire");
             return null;
@@ -11,17 +13,18 @@ public class ServiceClient {
             System.out.println("ERREUR : email invalide (" + email + ")");
             return null;
         }
-        if (!type.equals("PARTICULIER") && !type.equals("ENTREPRISE") && !type.equals("PREMIUM")) {
+        if (type == null) {
             System.out.println("ERREUR : type de client inconnu");
             return null;
         }
-        if (type.equals("ENTREPRISE") && (siret == null || siret.length() != 14)) {
+        if (type == TypeClient.ENTREPRISE && (siret == null || siret.length() != LONGUEUR_SIRET)) {
             System.out.println("ERREUR : SIRET obligatoire (14 chiffres) pour une entreprise");
             return null;
         }
         Client c = new Client(nom, email, telephone, adresse, type, siret);
         Database.getInstance().sauvegarderClient(c);
-        EmailService.envoyer(c.getEmail(), "Bienvenue chez TransFret", "Bonjour " + c.getNom() + ", votre compte " + c.getType().toLowerCase() + " a été créé.");
+        EmailService.envoyer(c.getEmail(), "Bienvenue chez TransFret",
+                "Bonjour " + c.getNom() + ", votre compte " + c.getType().name().toLowerCase() + " a été créé.");
         return c;
     }
 }

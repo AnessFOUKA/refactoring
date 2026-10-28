@@ -6,16 +6,19 @@ import java.util.List;
 
 public class Expedition {
 
+    private static final double CENTIMETRES_CUBES_PAR_METRE_CUBE = 1_000_000;
+    private static final int TAUX_TVA_EN_POURCENT = 20;
+
     private String id;
     private Client client;
     private List<Colis> colis = new ArrayList<Colis>();
     private String villeDepart;
     private String villeArrivee;
     private int distance;
-    private String mode;
+    private ModeTransport mode;
     private boolean urgent;
     private boolean assurance;
-    private String statut;
+    private StatutExpedition statut;
     private Date dateCreation;
     private Date dateLivraisonPrevue;
     private Vehicule vehicule;
@@ -36,7 +39,7 @@ public class Expedition {
         double total = 0;
         for (int i = 0; i < colis.size(); i++) {
             Colis c = colis.get(i);
-            total = total + (c.getLongueur() * c.getLargeur() * c.getHauteur()) / 1000000;
+            total = total + (c.getLongueur() * c.getLargeur() * c.getHauteur()) / CENTIMETRES_CUBES_PAR_METRE_CUBE;
         }
         return total;
     }
@@ -57,7 +60,7 @@ public class Expedition {
         sb.append("Facture n° F-" + id + "\n");
         sb.append("Date : " + Utils.formaterDate(new Date()) + "\n");
         sb.append("Client : " + client.getNom() + "\n");
-        if (client.getType().equals("ENTREPRISE")) {
+        if (client.getType() == TypeClient.ENTREPRISE) {
             sb.append("SIRET : " + client.getSiret() + "\n");
         }
         sb.append("Adresse : " + client.getAdresse() + "\n");
@@ -69,12 +72,12 @@ public class Expedition {
             sb.append("  - " + c.getDescription() + " : " + c.getPoids() + " kg [" + c.getLibelleType() + "]\n");
         }
         sb.append("----------------------------------------------\n");
-        if (statut.equals("ANNULEE")) {
+        if (statut == StatutExpedition.ANNULEE) {
             sb.append("EXPEDITION ANNULEE\n");
             sb.append("Frais d'annulation TTC : " + String.format("%.2f", fraisAnnulation) + " €\n");
         } else {
             sb.append("Total HT  : " + String.format("%.2f", prixHT) + " €\n");
-            sb.append("TVA 20%   : " + String.format("%.2f", prixTTC - prixHT) + " €\n");
+            sb.append("TVA " + TAUX_TVA_EN_POURCENT + "%   : " + String.format("%.2f", prixTTC - prixHT) + " €\n");
             sb.append("Total TTC : " + String.format("%.2f", prixTTC) + " €\n");
         }
         sb.append("==============================================\n");
@@ -129,11 +132,11 @@ public class Expedition {
         this.distance = distance;
     }
 
-    public String getMode() {
+    public ModeTransport getMode() {
         return mode;
     }
 
-    public void setMode(String mode) {
+    public void setMode(ModeTransport mode) {
         this.mode = mode;
     }
 
@@ -153,11 +156,11 @@ public class Expedition {
         this.assurance = assurance;
     }
 
-    public String getStatut() {
+    public StatutExpedition getStatut() {
         return statut;
     }
 
-    public void setStatut(String statut) {
+    public void setStatut(StatutExpedition statut) {
         this.statut = statut;
     }
 
